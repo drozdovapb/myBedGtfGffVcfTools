@@ -15,4 +15,4 @@ Usage: compare_vcf.py \<initial.vcf\> \<derived.vcf\> \<output.vcf\>
 
 lexicoSV.py takes a bed file with reference-assisted annotation as input and returns the list of contigs where it finds genes from different chromosomes (could be due to structural variation or assembly errors).
 It is written for S. cerevisiae standard ORF names (SGD). 
-Usage: lexicoSV.py <input.bed> <output.bed>
+Usage: lexicoSV.py \<input.bed\> \<output.txt\>
