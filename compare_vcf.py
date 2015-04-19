@@ -1,31 +1,22 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 
+
 def __main__():
-    file1_name = sys.argv[1]
-    file2_name = sys.argv[2]
-    output_name = sys.argv[3]
+    file1_name, file2_name, output_name = sys.argv[1:]
 
     out = open(output_name, 'w')
 
-#reading files
+#reading data
 
-    file1 = list()
     with open(file1_name, 'r') as fh1:
-        for line in fh1:
-            file1.append(line.split('\t'))
-            #out.write(line)
+        file1 = [line.split('\t') for line in fh1]
 
-    file2 = list()
     with open(file2_name, 'r') as fh2:
-        for line in fh2:
-            file2.append(line.split('\t'))
-            #out.write(line)
+        file2 = [line.split('\t') for line in fh2]
 
-    file1_for_compare = list()  # this list includes only the invariable information about a SNP
-    for line in file1:
-        file1_for_compare.append(str(' '.join(line[:5])))
+    file1_for_compare = [' '.join(line[:5]) for line in file1]  # only invariable information about SNPs in one string
 
 #The actual comparison
 
@@ -39,5 +30,5 @@ def __main__():
             index += 1
 
 
-
-if __name__ == "__main__": __main__()
+if __name__ == "__main__":
+    __main__()
