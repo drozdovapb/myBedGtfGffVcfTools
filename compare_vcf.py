@@ -8,26 +8,26 @@ def read_vcf(filename):
         return [line.split('\t') for line in fh]
 
 
-def __main__():
-    file1_name, file2_name, output_name = sys.argv[1:]
+def main():
+    reference_name, mutant_name, output_name = sys.argv[1:]
 
-#reading data
-    file1 = read_vcf(file1_name)
-    file2 = read_vcf(file2_name)
+    #reading data
+    reference = read_vcf(reference_name)
+    mutant = read_vcf(mutant_name)
 
-    file1_for_compare = [' '.join(line[:5]) for line in file1]
-    # only invariable information about SNPs in one string
+    # unique information for each variant
+    reference_variants = [' '.join(line[:5]) for line in reference]
 
-#The actual comparison
+    #The actual comparison
     index = 0
-    for line2 in file2:
-        elem = str(' '.join(line2[:5]))
-        if elem not in file1_for_compare[index:]:
-            with open(output_name, 'w') as out:
-                out.write('\t'.join(line2))
-        else:
-            index += 1
+    with open(output_name, 'w') as out:
+        for line in mutant:
+            variant = ' '.join(line[:5])  # unique information for this variant
+            if variant not in reference_variants[index:]:
+                    out.write('\t'.join(line))
+            else:
+                index += 1
 
 
 if __name__ == "__main__":
-    __main__()
+    main()
