@@ -10,7 +10,7 @@ def read_vcf(filename):
 
 
 def main():
-    reference_filename, mutant_filename, output_name = sys.argv[1:]
+    reference_filename, mutant_filename, output_filename = sys.argv[1:]
 
     #reading data
     reference = read_vcf(reference_filename)
@@ -21,7 +21,7 @@ def main():
 
     #The actual comparison
     position = 0
-    with open(output_name, 'w') as out:
+    with open(output_filename, 'w') as out:
         for line in mutant:
             variant = ' '.join(line[:5])  # unique information for this variant
             if variant not in itertools.islice(reference_variants, position, None):
