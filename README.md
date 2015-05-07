@@ -63,7 +63,7 @@ Of note: the name and the value of each attribute are separated with a space, an
 
 Biomart example:
 
-1	ensembl	gene	11193	15975	.	+	.	gene_id "ENSECAG00000012421"; gene_version "1"; gene_name "SYCE1"; gene_source "ensembl"; gene_biotype "protein_coding";
+`1	ensembl	gene	11193	15975	.	+	.	gene_id "ENSECAG00000012421"; gene_version "1"; gene_name "SYCE1"; gene_source "ensembl"; gene_biotype "protein_coding";`
 
 See more at (http://mblab.wustl.edu/GTF2.html)
 
@@ -88,7 +88,7 @@ Of note: the name and the value of each attribute are separated with a =, and va
 
 poff preferred example:
 
-gi<something>	sim	CDS	1	1	.	+	.	ID=C_1;
+`gi<something>	sim	CDS	1	1	.	+	.	ID=C_1;`
 
 See more at http://gmod.org/wiki/GFF3#GFF3_Format
 
