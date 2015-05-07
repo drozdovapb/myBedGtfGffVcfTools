@@ -8,10 +8,15 @@ def read_tsv(filename):
     Basically, all flavors of gff and gtf as well as vcf and bed files
     are just tab separated tables.
     This function takes a filename
-    and returns a list of lists
+    and returns a list of lists of strings
     """
     with open(filename, 'r') as fh:
-        return [line.split('\t') for line in fh]
+        list_obj = []
+        for line in fh:
+            if not line.startswith('#'):  # skip comment lines
+                line = line.rstrip()
+                list_obj.append(line.split('\t'))
+    return list_obj
 
 
 def write_tsv(list_obj, output_file):
@@ -21,16 +26,18 @@ def write_tsv(list_obj, output_file):
     """
     with open(output_file, 'w') as out:
         for line in list_obj:
-            out.write('\t'.join(line))
+            out.write('\t'.join([str(x) for x in line]) + '\n')
+            # conversion to string used to avoid problems with integer coordinates
 
 
-def id_gff2_to_gff3(line):
+def id_gff2_to_gff3(attributes):
     # change and save gene_id
-    line[-1] = re.sub(r'gene_id \"(\w*).*?"', 'ID=\g<1>', line[-1])
+    attributes = re.sub(r'gene_id \"(\w*).*?"', 'ID=\g<1>', attributes)
     #change and save gene_name
-    line[-1] = re.sub(r'gene_name \"(\w*).*?"', 'Name=\g<1>', line[-1])
+    attributes = re.sub(r'gene_name \"(\w*).*?"', 'Name=\g<1>', attributes)
     #get rid of other details
-    re.sub(r'gene_.*? \"(\w*).*?\";', '', line[-1])
+    re.sub(r'gene_.*? \"(\w*).*?\";', '', attributes)
+    return attributes
 
 
 def gtf2gff3(gtf2_filename, gff3_filename, cds_only=True):
@@ -52,7 +59,7 @@ def gtf2gff3(gtf2_filename, gff3_filename, cds_only=True):
                     id_gff2_to_gff3(line)
                     gff3.append(line)
             else:
-                id_gff2_to_gff3(line)
+                id_gff2_to_gff3(line[-1])
                 gff3.append(line)
     write_tsv(gff3, gff3_filename)
     return gff3
@@ -74,10 +81,7 @@ def gff2bed(gff3_filename, bed_filename, fromfile=True):
     This version supports short bed files only
     Future versions will support long bed files (12 fields)
     """
-    if fromfile:
-            gff3 = read_tsv(gff3_filename)
-    else:
-        gff3 = gff3_filename
+    gff3 = read_tsv(gff3_filename) if fromfile else gff3_filename
     bed = []
     for line in gff3:
         #bed used 0-based coords while gff uses 1-based coords
@@ -88,53 +92,49 @@ def gff2bed(gff3_filename, bed_filename, fromfile=True):
     return bed
 
 
-def bed2gff(bed_filename, out):
+def bed2gff3(bed_filename, gff_filename, source='bed2gff'):
     """
-    The idea is taken from galaxy (usegalaxy.org)
+    The idea is taken from galaxy (usegalaxy.org) but was sufficiently renewed
     :param bed:
     :return:
-    The code below this point is not worth reading
+    Source may bee explicitly specified by the user (eg the program used to obtain evidence)
     """
     bed = read_tsv(bed_filename)
     gff = []
+    long_bed = len(bed[0]) == 12
     for line in bed:
-        long_bed = False
-        if line and not line[0].startswith('#') and not line[0].startswith('track') and not line[0].startswith('browser'):
-            if len(line) == 12:
-                long_bed = True
-            chrom = line[0]
-            if long_bed:
-                feature = "gene"
-            else:
-                feature = line[3]
-            start = int(line[1]) + 1
-            end = int(line[2])
+        chrom = line[0]
+        start = str(int(line[1]) + 1)
+        end = line[2]
+        # if there are only 3 fields (short bed) we do not have enough information
+        score, strand, attributes = '0', '.', ''
+        #bed formatted files do not store source, phase and type information. Alas
+        feature_type = "gene"
+        phase = '.'
+        if long_bed:
             score = line[4]
             strand = line[5]
-            group = 'gene_id ' + '"' + line[3] + '"' + '; transcript_id ' + '"' + line[3] + '"' + '; gene_biotype "protein_coding"'
-            if long_bed:
-                gff.append('\t'.join([chrom, 'bed2gff', feature, start, end, score, strand, feature, group]))
-                gff.append('\t'.join([chrom, 'protein_coding', feature, start, end, score, strand, feature, group]))
-            else:
-                gff.append('\t'.join([chrom, 'protein_coding', feature, start, end, score, strand,'.', group]))
-            if long_bed:
-                # We have all the info necessary to annotate exons for genes and mRNAs
-                block_count = int( line[9] )
-                block_sizes = line[10].split(',')
-                block_starts = line[11].split(',')
-                for j in range(block_count):
-                    exon_start = int(start) + int( block_starts[j] )
-                    exon_end = exon_start + int( block_sizes[j] ) - 1
-                    #first exons
-                    if j == 0:
-                        frame = 0
-                    #Here really should be some code to deal with introns
-                    else:
-                        frame = 0
-                    out.write('%s\tprotein_coding\tCDS\t%d\t%d\t%s\t%s\t%s\texon %s;\n'
-                               % (chrom, exon_start, exon_end, score, strand, frame, group))
-                    out.close()
+            attributes = 'ID=' + line[3]
+        gff.append([chrom, source, feature_type, start, end, score, strand, phase, attributes])
+        # Some code to deal with introns will be here
+    write_tsv(gff, gff_filename)
+    return gff
 
 
+#if __name__ == "__main__": main()  # to be applied
 
-#if __name__ == "__main__": main()
+
+#Some tests that shouldn't be here
+#Everything below this line is to be replaced with proper tests
+
+#path_to_test_files = "/media/drozdovapb/big/Studies/bioinformaticsinstitute/bio-py-14/myBedGtfGffVcfTools/test/"
+
+#gff2bed(path_to_test_files + "test_augustus_gff3.gff",
+#        "/media/drozdovapb/big/Studies/bioinformaticsinstitute/bio-py-14/test_out_bed")
+
+#a = read_tsv("/media/drozdovapb/big/Studies/bioinformaticsinstitute/bio-py-14/myBedGtfGffVcfTools/test/test_augustus_gff3.gff")
+#print(a[2:4])
+
+#b = bed2gff3(path_to_test_files + "test_liftover.bed",
+#        "/media/drozdovapb/big/Studies/bioinformaticsinstitute/bio-py-14/test_out_gff3",
+#        "liftover")
