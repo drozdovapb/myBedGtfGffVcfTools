@@ -7,8 +7,17 @@ GTF2.2 is alike GFF2 but more strictly defined. Eight required fields + the 'gro
 <seqname> <source> <feature> <start> <end> <score> <strand> <frame> [attributes] [comments]
 Attributes must contain transcript_id / protein_id / gene_id
 See more at (http://mblab.wustl.edu/GTF2.html)
+Biomart example:
+1	ensembl	gene	11193	15975	.	+	.	gene_id "ENSECAG00000012421"; gene_version "1"; gene_name "SYCE1"; gene_source "ensembl"; gene_biotype "protein_coding";
+
 
 GFF3 is the newer version of GFF not supported by some browsers.
+Different versions
+poff preferred example:
+gi<something>	sim	CDS	1	1	.	+	.	ID=C_1;
+Specification here: http://gmod.org/wiki/GFF3#GFF3_Format
+seqid, source, type, start, end, score, strand, phase, attributes
+attributes: ID, Name, Alias, Parent, Target, Gap, Derives_from, Note, Dbxref, Ontology term.
 
 
 VCF is designed to store information about sequence variations. 
