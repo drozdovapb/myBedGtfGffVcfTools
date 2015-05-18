@@ -3,32 +3,7 @@
 import re
 import sys
 import getopt
-
-
-def _read_tsv(filename):
-    """
-    Basically, all flavors of gff and gtf as well as vcf and bed files
-    are just tab separated tables.
-    This function takes a filename
-    and returns a list of lists of strings
-    """
-    with open(filename, 'r') as fh:
-        list_of_lists = []
-        for line in fh:
-            if not line.startswith('#'):  # skip comment lines
-                list_of_lists.append(line.rstrip().split('\t'))
-    return list_of_lists
-
-
-def _write_tsv(list_of_lists, filename):
-    """
-    Takes a list of lists (list_obj) and writes a file
-    This function doesn't return anything
-    """
-    with open(filename, 'w') as out:
-        for line in list_of_lists:
-            out.write('\t'.join(line) + '\n')
-            # conversion to string used to avoid problems with integer coordinates
+import base_functions as bf
 
 
 def _id_gff2_to_gff3(attributes):
@@ -48,7 +23,7 @@ def gtf2gff3(gtf2_filename, gff3_filename, cds_only=False):
     and also returns a list of lists
     Optimized for feeding ProteinOrtho
     """
-    gtf2 = _read_tsv(gtf2_filename)
+    gtf2 = bf._read_tsv(gtf2_filename)
     gff3 = []
     for line in gtf2:
         if cds_only:
@@ -58,7 +33,7 @@ def gtf2gff3(gtf2_filename, gff3_filename, cds_only=False):
         else:
             line[-1] = _id_gff2_to_gff3(line[-1])
             gff3.append(line)
-    _write_tsv(gff3, gff3_filename)
+    bf._write_tsv(gff3, gff3_filename)
     return gff3
 
 
@@ -78,14 +53,14 @@ def gff2bed(gff3_filename, bed_filename):
     This version supports short bed files only
     Future versions will support long bed files (12 fields)
     """
-    gff3 = _read_tsv(gff3_filename)
+    gff3 = bf._read_tsv(gff3_filename)
     bed = []
     for line in gff3:
         #bed used 0-based coords while gff uses 1-based coords
         chrom = line[0]
         start, stop = str(int(line[3])-1), line[4]
         bed.append([chrom, start, stop])
-    _write_tsv(bed, bed_filename)
+    bf._write_tsv(bed, bed_filename)
     return bed
 
 
@@ -96,7 +71,7 @@ def bed2gff3(bed_filename, gff_filename, source='bed2gff'):
     writes a gff3 file and also returns a gff3-like object
     Source may be explicitly specified by the user (eg the program used to obtain evidence)
     """
-    bed = _read_tsv(bed_filename)
+    bed = bf._read_tsv(bed_filename)
     gff = []
     long_bed = len(bed[0]) == 12
     for line in bed:
@@ -113,7 +88,7 @@ def bed2gff3(bed_filename, gff_filename, source='bed2gff'):
             attributes = 'ID=' + genename
         gff.append([chrom, source, feature_type, start, end, score, strand, phase, attributes])
         # Some code to deal with introns will be here
-    _write_tsv(gff, gff_filename)
+    bf._write_tsv(gff, gff_filename)
     return gff
 
 
