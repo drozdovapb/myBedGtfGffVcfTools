@@ -23,7 +23,7 @@ def gtf2gff3(gtf2_filename, gff3_filename, cds_only=False):
     and also returns a list of lists
     Optimized for feeding ProteinOrtho
     """
-    gtf2 = bf._read_tsv(gtf2_filename)
+    gtf2 = bf.read_tsv(gtf2_filename)
     gff3 = []
     for line in gtf2:
         if cds_only:
@@ -33,7 +33,7 @@ def gtf2gff3(gtf2_filename, gff3_filename, cds_only=False):
         else:
             line[-1] = _id_gff2_to_gff3(line[-1])
             gff3.append(line)
-    bf._write_tsv(gff3, gff3_filename)
+    bf.write_tsv(gff3, gff3_filename)
     return gff3
 
 
@@ -53,14 +53,14 @@ def gff2bed(gff3_filename, bed_filename):
     This version supports short bed files only
     Future versions will support long bed files (12 fields)
     """
-    gff3 = bf._read_tsv(gff3_filename)
+    gff3 = bf.read_tsv(gff3_filename)
     bed = []
     for line in gff3:
         #bed used 0-based coords while gff uses 1-based coords
         chrom = line[0]
         start, stop = str(int(line[3])-1), line[4]
         bed.append([chrom, start, stop])
-    bf._write_tsv(bed, bed_filename)
+    bf.write_tsv(bed, bed_filename)
     return bed
 
 
@@ -71,7 +71,7 @@ def bed2gff3(bed_filename, gff_filename, source='bed2gff'):
     writes a gff3 file and also returns a gff3-like object
     Source may be explicitly specified by the user (eg the program used to obtain evidence)
     """
-    bed = bf._read_tsv(bed_filename)
+    bed = bf.read_tsv(bed_filename)
     gff = []
     long_bed = len(bed[0]) == 12
     for line in bed:
@@ -88,7 +88,7 @@ def bed2gff3(bed_filename, gff_filename, source='bed2gff'):
             attributes = 'ID=' + genename
         gff.append([chrom, source, feature_type, start, end, score, strand, phase, attributes])
         # Some code to deal with introns will be here
-    bf._write_tsv(gff, gff_filename)
+    bf.write_tsv(gff, gff_filename)
     return gff
 
 
@@ -132,24 +132,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-#Test section
-#Some tests that shouldn't be here
-#Everything below this line is to be replaced with proper tests
-
-#path_to_test_files = "/media/drozdovapb/big/Studies/bioinformaticsinstitute/bio-py-14/myBedGtfGffVcfTools/test/"
-
-#gff2bed(path_to_test_files + "test_augustus_gff3.gff",
-#        "/media/drozdovapb/big/Studies/bioinformaticsinstitute/bio-py-14/test_out_bed")
-
-#a = read_tsv("/media/drozdovapb/big/Studies/bioinformaticsinstitute/bio-py-14/myBedGtfGffVcfTools/test/test_augustus_gff3.gff")
-#print(a[2:4])
-
-#b = bed2gff3(path_to_test_files + "test_liftover.bed",
-#        "/media/drozdovapb/big/Studies/bioinformaticsinstitute/bio-py-14/test_out_gff3",
-#        "liftover")
-
-#gtf2gff3('/media/drozdovapb/big/Peterhof_strains_seq/Annotation/Repeats/15V_contigs.fasta.out.gff',
-#         '/media/drozdovapb/big/Peterhof_strains_seq/Annotation/Repeats/15V_repeatmasker_gff3.gff',
-#         cds_only=False)

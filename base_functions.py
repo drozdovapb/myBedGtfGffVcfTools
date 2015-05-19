@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-def _read_tsv(filename):
+def read_tsv(filename):
     """
     All flavors of gff, gtf, vcf, and bed files
     are just tab separated tables.
@@ -16,7 +16,7 @@ def _read_tsv(filename):
     return list_of_lists
 
 
-def _write_tsv(list_of_lists, filename):
+def write_tsv(list_of_lists, filename):
     """
     Takes a list of lists (list_obj) and writes a file
     This function doesn't return anything
