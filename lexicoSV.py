@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+from io_tools import read_tsv
 
 
 def check_for_peculiarities(list_of_features):
@@ -12,7 +13,7 @@ def check_for_peculiarities(list_of_features):
     or assembly / annotation errors.
     """
 
-    contigs = dict()  # a distionary of contig names and chromosomes
+    contigs = {}  # a distionary of contig names and chromosomes
     strange_contigs = set()  # stores names of contigs with non-adjacent genes
     for line in list_of_features:
         contig_name = line[0]
@@ -34,8 +35,7 @@ def check_for_peculiarities(list_of_features):
 def main():
     input_name, output_name = sys.argv[1:]
 
-    with open(input_name, 'r') as fh1:
-        features = [line.split('\t') for line in fh1]
+    features = read_tsv(input_name)
 
     strange_contigs = check_for_peculiarities(features)
 
