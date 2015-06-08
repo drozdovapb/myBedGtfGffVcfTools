@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 
 def read_tsv(filename):
     """
@@ -19,9 +20,13 @@ def read_tsv(filename):
 
 def write_tsv(list_of_lists, filename):
     """
-    Takes a list of lists (list_obj) and writes a file
+    Takes a list of lists (list_obj) and writes a file (or to stdout)
     This function doesn't return anything
     """
-    with open(filename, 'w') as out:
+    if filename == sys.stdout:
         for line in list_of_lists:
-            out.write('\t'.join(line) + '\n')
+            sys.stdout.write('\t'.join(line) + '\n')
+    else:
+        with open(filename, 'w') as out:
+            for line in list_of_lists:
+                out.write('\t'.join(line) + '\n')
