@@ -2,6 +2,7 @@
 
 import sys
 
+
 def read_tsv(filename):
     """
     All flavors of gff, gtf, vcf, and bed files
@@ -18,15 +19,18 @@ def read_tsv(filename):
     return list_of_lists
 
 
-def write_tsv(list_of_lists, filename):
+def _write_out(list_of_lists, output):
+    for line in list_of_lists:
+        output.write('\t'.join(line) + '\n')
+
+
+def write_tsv(list_of_lists, filename=sys.stdout):
     """
     Takes a list of lists (list_obj) and writes a file (or to stdout)
     This function doesn't return anything
     """
-    if filename == sys.stdout:
-        for line in list_of_lists:
-            sys.stdout.write('\t'.join(line) + '\n')
+    if filename is sys.stdout:
+        _write_out(list_of_lists, sys.stdout)
     else:
         with open(filename, 'w') as out:
-            for line in list_of_lists:
-                out.write('\t'.join(line) + '\n')
+            _write_out(list_of_lists, out)
