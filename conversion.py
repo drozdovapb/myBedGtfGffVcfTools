@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import re
-import sys
-#import getopt
 import argparse
 import io_tools as io
 
@@ -101,13 +99,14 @@ def main():
     parser = argparse.ArgumentParser()
 
     required = parser.add_argument_group('required arguments')
-    required.add_argument("-f", "--function", help="function name", required=True)
+    required.add_argument("-f", "--function", help="function name "
+                                                   "(currently implemented functions: "
+                                                   "\n gtf_to_gff3, gff_to_bed, bed_to_gff3)", required=True)
     required.add_argument("-i", "--input_filename", help="input file", required=True)
     required.add_argument("-o", "--output_filename", help="output file", required=True)
 
-    parser.add_argument("--source", default="bed2gff")
+    parser.add_argument("--source", default="bed2gff", help="")
     parser.add_argument("--cds_only", type=bool, default=True)
-
 
     args = parser.parse_args()
 
@@ -118,7 +117,7 @@ def main():
     elif args.function == "bed_to_gff3":
         bed_to_gff3(args.input_filename, args.output_filename, args.source)
     else:
-        print('This function is not implemented')
+        print(args.function, ': This function is not implemented')
         print("Currently implemented functions: gtf_to_gff3, gff_to_bed, bed_to_gff3")
 
 if __name__ == "__main__":
