@@ -2,7 +2,8 @@
 
 import re
 import sys
-import getopt
+#import getopt
+import argparse
 import io_tools as io
 
 
@@ -96,38 +97,29 @@ def main():
     """
     Inputs: input file, output file, conversion function, other arguments
     """
-    cds_only, source = False, 'bed2gff'  # pass default argument values
 
-    if len(sys.argv) < 5:
-        # print usage message and quit
-        print('conversion.py -f <function> -i <inputfile> -o <outputfile>')
-        sys.exit(2)
+    parser = argparse.ArgumentParser()
 
-    opts, args = getopt.getopt(sys.argv[1:], "hf:i:o:",
-                               ['help', 'function=', 'input=', 'output=', 'source=', 'cds_only'])
-    for opt, arg in opts:
-        if opt in ('-f', '--function'):
-            function_name = arg
-        elif opt in ('-i', '--input'):
-            input_filename = arg
-        elif opt in ('-o', '--output'):
-            output_filename = arg
-        elif opt in ('-h', '--help'):
-            print('conversion.py -f <function> -i <inputfile> -o <outputfile>')
-        elif opt == 'source=':
-            source = arg
-        elif opt == 'cds_only':
-            cds_only = arg
+    required = parser.add_argument_group('required arguments')
+    required.add_argument("-f", "--function", help="function name", required=True)
+    required.add_argument("-i", "--input_filename", help="input file", required=True)
+    required.add_argument("-o", "--output_filename", help="output file", required=True)
 
-    if function_name == 'gtf_to_gff3':
-        gtf_to_gff3(input_filename, output_filename, cds_only)
-    elif function_name == "gff_to_bed":
-        gff_to_bed(input_filename, output_filename)
-    elif function_name == "bed_to_gff3":
-        bed_to_gff3(input_filename, output_filename, source)
+    parser.add_argument("--source", default="bed2gff")
+    parser.add_argument("--cds_only", type=bool, default=True)
+
+
+    args = parser.parse_args()
+
+    if args.function == 'gtf_to_gff3':
+        gtf_to_gff3(args.input_filename, args.output_filename, args.cds_only)
+    elif args.function == "gff_to_bed":
+        gff_to_bed(args.input_filename, args.output_filename)
+    elif args.function == "bed_to_gff3":
+        bed_to_gff3(args.input_filename, args.output_filename, args.source)
     else:
         print('This function is not implemented')
-        sys.exit(2)
+        print("Currently implemented functions: gtf_to_gff3, gff_to_bed, bed_to_gff3")
 
 if __name__ == "__main__":
     main()
