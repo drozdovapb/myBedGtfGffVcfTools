@@ -15,14 +15,13 @@ def _id_gff2_to_gff3(attributes):
     return attributes
 
 
-def gtf_to_gff3(gtf2_filename, gff3_filename, cds_only=False):
+def gtf_to_gff3(gtf2, gff3_filename, cds_only=False):
     """
     This function takes a gtf2 file (gtf2_filename),
     writes a gff3 file to gff3_filename
     and also returns a list of lists
     Optimized for feeding ProteinOrtho
     """
-    gtf2 = io.read_tsv(gtf2_filename)
     gff3 = []
     for line in gtf2:
         if cds_only:
@@ -44,7 +43,7 @@ def gff3_to_gtf(gff3):
     pass
 
 
-def gff_to_bed(gff_filename, bed_filename):
+def gff_to_bed(gff3, bed_filename):
     """
     All ***2bed functions are utterly useful for working with the UCSC genome browser
     This function takes a gtf/gff-like object or reads a file,
@@ -52,10 +51,9 @@ def gff_to_bed(gff_filename, bed_filename):
     This version supports short bed files only
     Future versions will support long bed files (12 fields)
     """
-    gff3 = io.read_tsv(gff_filename)
     bed = []
     for line in gff3:
-        #bed used 0-based coords while gff uses 1-based coords
+        #bed used 0-based coordinates while gff uses 1-based coordinates
         chrom = line[0]
         start, stop = str(int(line[3])-1), line[4]
         bed.append([chrom, start, stop])
@@ -63,14 +61,13 @@ def gff_to_bed(gff_filename, bed_filename):
     return bed
 
 
-def bed_to_gff3(bed_filename, gff_filename, source='bed2gff'):
+def bed_to_gff3(bed, gff_filename, source='bed2gff'):
     """
     The idea is taken from galaxy (usegalaxy.org) but was sufficiently renewed
     This function takes a bed file,
     writes a gff3 file and also returns a gff3-like object
     Source may be explicitly specified by the user (eg the program used to obtain evidence)
     """
-    bed = io.read_tsv(bed_filename)
     gff = []
     long_bed = len(bed[0]) == 12
     for line in bed:
@@ -102,20 +99,25 @@ def main():
     required.add_argument("-f", "--function", help="function name "
                                                    "(currently implemented functions: "
                                                    "\n gtf_to_gff3, gff_to_bed, bed_to_gff3)", required=True)
-    required.add_argument("-i", "--input_filename", help="input file", required=True)
-    required.add_argument("-o", "--output_filename", help="output file", required=True)
+    required.add_argument("-i", "--input_filename", help="input file to work with", required=True)
+    required.add_argument("-o", "--output_filename", help="output file to write to", required=True)
 
-    parser.add_argument("--source", default="bed2gff", help="")
-    parser.add_argument("--cds_only", type=bool, default=True)
+    parser.add_argument("--source", default="bed2gff", help="source information in gtf "
+                                                            "(program that generated this file,"
+                                                            "database or project name)")
+    parser.add_argument("--cds_only", type=bool, default=False, help="generate only CDS lines"
+                                                                     "(default is FALSE)")
 
     args = parser.parse_args()
 
+    input_list_of_lists = io.read_tsv(args.input_filename)
+
     if args.function == 'gtf_to_gff3':
-        gtf_to_gff3(args.input_filename, args.output_filename, args.cds_only)
+        gtf_to_gff3(input_list_of_lists, args.output_filename, args.cds_only)
     elif args.function == "gff_to_bed":
-        gff_to_bed(args.input_filename, args.output_filename)
+        gff_to_bed(input_list_of_lists, args.output_filename)
     elif args.function == "bed_to_gff3":
-        bed_to_gff3(args.input_filename, args.output_filename, args.source)
+        bed_to_gff3(input_list_of_lists, args.output_filename, args.source)
     else:
         print(args.function, ': This function is not implemented')
         print("Currently implemented functions: gtf_to_gff3, gff_to_bed, bed_to_gff3")
