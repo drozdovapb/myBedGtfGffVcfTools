@@ -25,7 +25,7 @@ def gtf_to_gff3(gtf2, gff3_filename, cds_only=False):
     gff3 = []
     for line in gtf2:
         if cds_only:
-            if line[2] == ['CDS']:
+            if line[2:3] == ['CDS']:
                 line[-1] = _id_gff2_to_gff3(line[-1])
                 gff3.append(line)
         else:
