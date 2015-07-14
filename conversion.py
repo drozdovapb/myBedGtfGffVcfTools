@@ -56,8 +56,11 @@ def gff_to_bed(gff3, bed_filename):
         #bed used 0-based coordinates while gff uses 1-based coordinates
         chrom = line[0]
         start, stop = str(int(line[3])-1), line[4]
-        bed.append([chrom, start, stop])
-    io.write_tsv(bed, bed_filename)
+        #name = line[8][3:9]  # change this to something more flexible!!!!
+        name = line[8][3:]
+        score, strand = line[5], line[6]
+        bed.append([chrom, start, stop, name, score, strand])
+        io.write_tsv(bed, bed_filename)
     return bed
 
 
