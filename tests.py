@@ -1,65 +1,55 @@
 #!/usr/bin/env python3
 
-import io_tools as bf
-#import os
-import random
-from subprocess import check_output
 import conversion as cv
+import io_tools as io
+import random
+import unittest
+from tempfile import NamedTemporaryFile
+from subprocess import check_output
 
 
-def test_all():
-    test_read_tsv("test/test_liftover.bed")
-    test_read_tsv("test/test_augustus_gff3.gff")
-    test_gff2bed("test/test_augustus_gff3.gff", "../test_out_bed")
-    test_bed2gff3("test/test_liftover.bed", "../test_out_gff3")
-    test_gtf2gff3("test/test_gm_es.gtf", "../test_out_gff3")
-
-#Simple tests
+class TestConversionFunction(unittest.TestCase):
+    def check_number_of_fields(self):
+        self.assertEqual(len())
 
 
-def test_read_tsv(test_file):
-    temp = bf.read_tsv(test_file)
-    wc = int(check_output(["wc", "-l", test_file]).split()[0])
-    print('testing file', test_file)
-    print('line count in file', wc)
-    print('object length', len(temp))
-    print('checking line count:', len(temp) == wc + 1)
-    print('checking field count:', len(temp[0]) == 9)  # именованный параметр
-    print('printing a random line for visual check' + '\n' +
-          '\t'.join(temp[random.randint(1, len(temp))]) + '\n')
+class TestGtf2ToGff3Conversion(unittest.TestCase):
 
+    def setUp(self):
+        self.test_input = [
+            ['NODE_487', 'GeneMark.hmm', 'exon', '1487', '1693', '0', '+', '.', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'start_codon', '1487', '1489', '.', '+', '0', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'CDS', '1487', '1693', '.', '+', '0', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'exon', '1894', '2097', '0', '+', '.', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'CDS', '1894', '2097', '.', '+', '0', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'exon', '2223', '3429', '0', '+', '.', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'CDS', '2223', '3429', '.', '+', '0', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'exon', '3693', '4305', '0', '+', '.', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'CDS', '3693', '4305', '.', '+', '2', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'exon', '4337', '6176', '0', '+', '.', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'CDS', '4337', '6176', '.', '+', '1', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'stop_codon', '6174', '6176', '.', '+', '0', 'gene_id "98_g"; transcript_id "98_t";'],
+            ['NODE_487', 'GeneMark.hmm', 'exon', '6612', '7946', '0', '-', '.', 'gene_id "99_g"; transcript_id "99_t";']]
 
-def test_write_tsv():
-    pass
+        self.cds_count = self.calc_cds(self.test_input)
+        self.records_count = len(self.test_input)
 
+    def calc_cds(self, data):
+        return sum(line[2] == 'CDS'
+                   for line in data)
 
-def test_conversion_function(temp, number_of_fields):
-    print('checking field count:', len(temp[0]) == number_of_fields)
-    print('printing a random line of bed output for visual check')
-    print(str(temp[random.randint(1, len(temp))]) + '\n')
+    def test_default_mode(self):
+        with NamedTemporaryFile() as out:
+            gff = cv.gtf_to_gff3(self.test_input, out.name)
+            self.assertEqual(len(gff), self.records_count)
 
-
-def test_gff2bed(test_file, test_out_file):
-    temp = cv.gff_to_bed(test_file, test_out_file)
-    print('testing gff2bed')
-    test_conversion_function(temp, 3)  # именованный параметр
-
-
-def test_bed2gff3(test_file, test_out_file):
-    temp = cv.bed_to_gff3(test_file, test_out_file)
-    print('testing bed2gff3')
-    test_conversion_function(temp, 9)
-    pass
-
-
-def test_gtf2gff3(test_file, test_out_file):
-    temp = cv.gtf_to_gff3(test_file, test_out_file)
-    print('testing gtf2gff3')
-    test_conversion_function(temp, 9)
-
+    def test_cds_only(self):
+        with NamedTemporaryFile() as out:
+            gff = cv.gtf_to_gff3(self.test_input, out.name, cds_only=True)
+            print(gff)
+            self.assertEqual(len(gff), self.cds_count)
+            for line in gff:
+                self.assertFalse('gene_id' in line[-1])
 
 if __name__ == '__main__':
-    test_all()
-
-
-#Add tests for lexiconSV and compare_vcf!!! => test => commit
+    unittest.main()
