@@ -60,7 +60,7 @@ def gff_to_bed(gff3, bed_filename):
         name = line[8][3:]
         score, strand = line[5], line[6]
         bed.append([chrom, start, stop, name, score, strand])
-        io.write_tsv(bed, bed_filename)
+    io.write_tsv(bed, bed_filename)
     return bed
 
 
