@@ -1,4 +1,4 @@
-This repo contains code for manipulating annotation files.
+This repo contains code for manipulating annotation file formats.
 
 ##Repository structure
 
@@ -8,18 +8,28 @@ The scripts outside this folder should work.
 
 The `test/` folder contains examples to check the scripts.
 
-Each commit should be marked with either 'maintenance' or 'review'.
-
 ##Meaning and intended purpose of the scripts
 
-compare_vcf.py serves for the purpose of comparing two non-reference samples by their difference from reference. It outputs the variations from reference existing in the first of the samples (not the symmetric difference). It could be useful for comparing two samples one of which is derived from the other.
+**compare_vcf.py** serves for the purpose of comparing two non-reference samples by their difference from reference. It outputs the variations from reference existing in the first of the samples (not the symmetric difference). It could be useful for comparing two samples one of which is derived from the other.
 
 Usage: `compare_vcf.py <initial.vcf> <derived.vcf> <output.vcf>`
 
-lexicoSV.py takes a bed file with reference-assisted annotation as input and returns the list of contigs where it finds genes from different chromosomes (could be due to structural variation or assembly errors).
+update: it does work but bedtools intersect -v is much faster, so I would strongly recommend using this well-known tool instead of my code.
+
+**lexicoSV.py** takes a bed file with reference-assisted annotation as input and returns the list of contigs where it finds genes from different chromosomes (could be due to structural variation or assembly errors).
 It is written for S. cerevisiae standard ORF names (SGD). 
 
 Usage: `lexicoSV.py <input.bed> <output.txt>`
+
+**conversion.py**, the main script in this folder
+Usage: `conversion.py [-h] -f FUNCTION -i INPUT_FILENAME -o OUTPUT_FILENAME
+                     [--source SOURCE] [--cds_only CDS_ONLY]`
+Currently supported formats: gtf to gff3, gff/gtf to bed, bed to gff3. 
+
+**rename_gff** scripts are useful if you have some annotation in which genes are not given any proper names (e.g. Maker2 output) and some knowledge about how these features shown be named (e.g. from a related species or another subspecies / strain / cultivar etc).
+**rename_gff_by_table** was written specifically for proteinortho output but should be applicable to any similar output.
+
+**tests.py** and **tests.sh** are just some scripts to test the code and report where it fails.
 
 
 ##Annotation file formats
