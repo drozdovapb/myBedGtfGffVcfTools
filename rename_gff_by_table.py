@@ -20,11 +20,7 @@ def main():
                 maker_name = cluster[3][:-27] #unique part of the name
                 proper_name = cluster[4]
                 if maker_name in line_to_rename[8]:
-                    #print('ldfj')
-                    #print(maker_name)
-                    #print(line_to_rename)
-                    #change the next line to something more flexible
-                    out.write('\t'.join(line_to_rename[:8]) + '\t' + proper_name + '_' + strain + '\n')
+                    out.write('\t'.join(line_to_rename[:8]) + '\t' + 'ID=' + proper_name + '_' + strain + '\n')
                     found = True
             if not found:
                 out.write('\t'.join(line_to_rename[:8]) + '\t' + 'ID=new_gene_' + str(new_gene_count) + '\n')
