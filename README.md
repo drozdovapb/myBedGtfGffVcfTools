@@ -28,6 +28,9 @@ Currently supported formats: gtf to gff3, gff/gtf to bed, bed to gff3.
 
 **rename_gff** scripts are useful if you have some annotation in which genes are not given any proper names (e.g. Maker2 output) and some knowledge about how these features shown be named (e.g. from a related species or another subspecies / strain / cultivar etc).
 **rename_gff_by_table** was written specifically for proteinortho output but should be applicable to any similar output.
+proteinortho output looks like this: 
+`# Species	Genes	Alg.-Conn.	<sample1 name> 	<sample2 name>`
+The basic idea is to cluster sequences and use the table to rename entries.
 
 **tests.py** and **tests.sh** are just some scripts to test the code and report where it fails.
 
