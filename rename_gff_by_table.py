@@ -20,9 +20,9 @@ def main():
                     #exchange the next two lines if necessary (depends on the order in the table)
                     #maker_name = cluster[3][:-27] #unique part of the name
                     #maker_name = cluster[3][:-7] #unique part of the name if using augustus
-                    maker_name = cluster[3]  # [:7] is not truly unique because there might be '01' and '013'
+                    maker_name = cluster[4]  # [:7] is not truly unique because there might be '01' and '013'
                     #print(maker_name)
-                    proper_name = cluster[4]
+                    proper_name = cluster[3]
                     if maker_name in line_to_rename[8]:
                         out.write('\t'.join(line_to_rename[:8]) + '\t' + 'ID=' + proper_name + '\n')  # '_' + strain
                         #print('yeap')
