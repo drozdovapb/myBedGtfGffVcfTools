@@ -22,18 +22,20 @@ def correct_coord(list_of_lists, filetype, out_filename):
     and also returns a list of lists
     Optimized for feeding ProteinOrtho
     """
+    new = []
     cnt = 0
     if filetype == "bed":
         start, stop = 1, 2
     elif filetype == "gff":
         start, stop = 3, 4
     for line in list_of_lists:
-        if line[start] > line[stop]:
-            line[stop], line[start] = line[start], line[stop]
+        if int(line[start]) > int(line[stop]):
+            line[start], line[stop] = line[stop], line[start]
             cnt += 1
-    io.write_tsv(list_of_lists, out_filename)
+        new.append(line)
+    io.write_tsv(new, out_filename)
     print("corrected ", str(cnt), "lines")
-    return list_of_lists
+    return new
 
 
 def main():
