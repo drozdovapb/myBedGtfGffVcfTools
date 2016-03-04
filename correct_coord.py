@@ -1,57 +1,47 @@
 #!/usr/bin/env python3
 
-import re
 import argparse
+import os
 import io_tools as io
-
-
-def _id_gff2_to_gff3(attributes):
-    # change and save gene_id
-    attributes = re.sub(r'gene_id \"(\w*).*?"', 'ID=\g<1>', attributes)
-    # change and save gene_name
-    attributes = re.sub(r'gene_name \"(\w*).*?"', 'Name=\g<1>', attributes)
-    # get rid of other details
-    attributes = re.sub(r'gene_.*? \"(\w*).*?\";', '', attributes)
-    return attributes
-
+import sys
 
 def correct_coord(list_of_lists, filetype, out_filename):
     """
-    This function takes a gtf2 file (gtf2_filename),
-    writes a gff3 file to gff3_filename
-    and also returns a list of lists
-    Optimized for feeding ProteinOrtho
+    Flips the coordinates if the start coordinate is greater than stop.
     """
-    new = []
     cnt = 0
-    if filetype == "bed":
+    if filetype == ".bed":
         start, stop = 1, 2
-    elif filetype == "gff":
+        shift = 1  # bed is ZERO-based
+    elif filetype == ".gff":
         start, stop = 3, 4
+        shift = 0  # gff is ONE-based
     for line in list_of_lists:
         if int(line[start]) > int(line[stop]):
-            line[start], line[stop] = line[stop], line[start]
+            newstart = str(int(line[stop]) - shift)
+            newstop = str(int(line[start]) + shift)
+            line[start], line[stop] = newstart, newstop
             cnt += 1
-        new.append(line)
-    io.write_tsv(new, out_filename)
+    io.write_tsv(list_of_lists, out_filename)
     print("corrected ", str(cnt), "lines")
-    return new
 
 
 def main():
     """
-    Inputs: input file, output file, conversion function, other arguments
+    Inputs: input file, output file name
     """
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-i", "--input_filename", help="input file to work with", required=True)
-    parser.add_argument("-o", "--out", default="corrected.gff", help="output gff file")
+    parser.add_argument("-o", "--out", default="corrected.gff", help="output gff / bed file")
 
     args = parser.parse_args()
 
     input_list_of_lists = io.read_tsv(args.input_filename)
-    filetype = args.input_filename[-3:]
+    filetype = os.path.splitext(args.input_filename)[1]
+    if filetype not in [".bed", ".gff"]:
+        print("Unknown file extension. Please make sure you have a .bed or .gff file")
+        sys.exit("Unknown file type")
 
     correct_coord(input_list_of_lists, filetype, args.out)
 
