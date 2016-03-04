@@ -16,6 +16,11 @@ Usage: `compare_vcf.py <initial.vcf> <derived.vcf> <output.vcf>`
 
 update: it does work but bedtools intersect -v is much faster, so I would strongly recommend using this well-known tool instead of my code.
 
+**correct_coord.py** <input.gff/bed> <output.gff/bed>
+
+Some programs (e.g. command line Blast tabular output) list coordinates of the features as the find them, and so start can happen to be greater than stop. 
+Such data cannot be directly used as input to bedtools. This script solves this problem.
+
 **lexicoSV.py** takes a bed file with reference-assisted annotation as input and returns the list of contigs where it finds genes from different chromosomes (could be due to structural variation or assembly errors).
 It is written for S. cerevisiae standard ORF names (SGD). 
 
