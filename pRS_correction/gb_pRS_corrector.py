@@ -39,35 +39,9 @@ def edit_sequence(my_plasmid, changes_dict):
     if n_seqs_changed < 2:
         print('only ' + str(n_seqs_changed) + ' parts were changed. Please check manually')
 
-    #print(replaced)
-    #print(len(mutable_seq))
+    #remove plasmid features because they are now wrong
+    my_plasmid.features = [] #make a copy, otherwise it will edit both lists!
 
-    #then, correct features
-    #first, pop the old ones #I cannot
-
-    #here are the ones I would like to save (I'll edit this list!)
-    saved_features = my_plasmid.features[:] #make a copy, otherwise it will edit both lists!
-
-    #print(my_plasmid.features)
-
-    nchecked = 0
-
-    for feature in my_plasmid.features:
-        #print(len(my_plasmid.features))
-        nchecked += 1
-    #    print(feature)
-    #    print(feature.location.start)
-    #    print(feature.location.start in replaced)
-        if feature.location.start in replaced or feature.location.end in replaced:
-            saved_features.remove(feature)
-
-#    print(len(saved_features), nchecked)
-
-    my_plasmid.seq = Seq(mutable_seq, generic_dna)
-
-    #print(len(my_plasmid.seq))
-    #now, replace with saved features
-    my_plasmid.features = saved_features
 
     return my_plasmid
 
@@ -81,7 +55,7 @@ def main():
 
     #read a .gb file with the plasmid
     my_plasmid_name = sys.argv[1]
-    my_plasmid = SeqIO.read('old_maps/' + my_plasmid_name, 'genbank')
+    my_plasmid = SeqIO.read('' + my_plasmid_name, 'genbank')
 
     with open(sys.argv[2], 'r') as fh:
         changes_dict = json.load(fh)
