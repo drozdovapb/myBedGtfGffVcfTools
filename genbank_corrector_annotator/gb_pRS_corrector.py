@@ -50,8 +50,8 @@ def edit_sequence(my_plasmid, changes_dict):
 def main():
     if len(sys.argv) < 3:
         print('Please provide the following in this order: '
-              'input genbank file, changes dictionary '
-              'Example usage: python3 ./gb_annotator.py old_map.gb changes.txt')
+              'input genbank file, changes dictionary, new file name (optional) '
+              'Example usage: python3 ./gb_annotator.py old_map.gb changes.txt <new_plasmid.gb>')
         sys.exit(2)
 
 
@@ -73,7 +73,12 @@ def main():
 
     my_plasmid_filename = os.path.basename(my_plasmid_name)
 
-    SeqIO.write(my_plasmid, 'corrected_maps/' + my_plasmid_filename, 'genbank')
+    if len(sys.argv) == 4:
+        new_filename = sys.argv[3]
+    else:
+        new_filename = 'corrected_maps/' + my_plasmid_filename
+
+    SeqIO.write(my_plasmid, new_filename, 'genbank')
     print('Written the result to corrected_maps/' + my_plasmid_filename)
 
 if __name__ == "__main__":
