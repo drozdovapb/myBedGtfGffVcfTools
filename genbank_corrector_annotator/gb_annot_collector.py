@@ -38,11 +38,11 @@ def collect_annotations(file, annot_dict):
 
 
 def main():
-    if len(sys.argv) < 1:
-        print('Provide some files')
+    if len(sys.argv) < 2:
+        print('Please provide some .gb files \n')
+
     output = sys.stdout
     files = sys.argv[1:]
-    #files = ['pRS315.gb']
 
     #create an empty annotation dictionary
     annot_dict = dict()
