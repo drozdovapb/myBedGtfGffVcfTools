@@ -74,7 +74,7 @@ def main():
     my_plasmid_filename = os.path.basename(my_plasmid_name)
 
     if len(sys.argv) == 4:
-        new_filename = sys.argv[3]
+        new_filename = 'corrected_maps/' + sys.argv[3]
     else:
         new_filename = 'corrected_maps/' + my_plasmid_filename
 
