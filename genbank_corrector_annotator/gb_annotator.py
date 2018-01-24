@@ -10,7 +10,7 @@ def annotate(my_plasmid, annot_dict):
 
     for key in annot_dict.keys():
         name = str(annot_dict[key]['label'])
-        if my_plasmid.seq.find(key) > 0:
+        if my_plasmid.seq.find(key) > -1:
             start = my_plasmid.seq.find(key)
             end = start + len(key)
             #create new feature, put it in place and...
@@ -24,7 +24,7 @@ def annotate(my_plasmid, annot_dict):
         else:
             print(name + ' not found, trying complementary')
             comp = Seq(key, generic_dna).reverse_complement()
-            if my_plasmid.seq.find(comp) > 0:
+            if my_plasmid.seq.find(comp) > -1:
                 start = my_plasmid.seq.find(comp)
                 end = start + len(comp)
                 #create new feature, put it in place and...
