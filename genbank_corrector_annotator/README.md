@@ -8,8 +8,11 @@ Full plasmid correction pipeline is a three-step process. However, you can use o
 
 `python3 ./gb_annot_collector.py map1.gb map2.gb ... mapN.gb >collected_features.txt`
 
-You can use both a new version of the backbone and 
+You can use both a new version of the backbone and the old plasmid. 
 If the system says 'cannot overwrite the existing file' but you do wanna overwrite the existing file, replace `>` with `>|`. 
+If you don't want to have this dictionary, redirect the output to nowhere: `> /dev/null`
+
+This script also outputs a UGENE-formatted tab-separated database. I included timestamp to the file name to avoid overwriting useful files.
 
 ##### 2. Correct plasmid sequence:
 
