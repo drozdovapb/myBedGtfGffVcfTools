@@ -3,12 +3,13 @@ import json
 import sys
 #import argparse #this particular script does not parse anything
 from Bio import SeqIO
-
+import datetime
 
 def collect_annotations(file, annot_dict):
     """
     This script compiles a dictionary of all features in input genbank files and outputs them to stdout.
     Keys as sequences while values are all feature qualifiers
+    Outputs the dictionary to stdout + a database
     """
     #Load plasmid
     #read a .gb file with the plasmid
@@ -36,10 +37,10 @@ def collect_annotations(file, annot_dict):
     return annot_dict
 
 
-
 def main():
     if len(sys.argv) < 2:  # if no file is provided
         print('Please provide some .gb files \n')
+        sys.exit(2)
 
     output = sys.stdout
     files = sys.argv[1:]
@@ -53,9 +54,15 @@ def main():
     for file in files:
         collect_annotations(file, annot_dict)
 
-    #Write it to file
+    #Write it to file / stdout
     json.dump(annot_dict, output)
 
+    #and also write it to a tab-separated database
+    tsv_filename = str(datetime.datetime.now()).replace(" ", "_").replace(":", "_").replace(".","_") + ".tsv"
+    with open(tsv_filename, 'w') as out:
+        out.write("Feature" + "\t" + "Type" + "\t" + "Sequence" + "\n")
+        for key,value in annot_dict.items():
+            out.write("\t".join([str(annot_dict[key]["label"]), str(annot_dict[key]["type"]), str(key)]) + "\n")
 
 if __name__ == "__main__":
     main()
